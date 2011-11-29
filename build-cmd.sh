@@ -56,9 +56,6 @@ pushd "$HUNSPELL_SOURCE_DIR"
             CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage"
             make
             make install
-            mkdir -p "$stage/include/hunspell"
-            mv "$stage/include/"*.h "$stage/include/hunspell/"
-
             mv "$stage/lib" "$stage/release"
             mkdir -p "$stage/lib"
             mv "$stage/release" "$stage/lib"
