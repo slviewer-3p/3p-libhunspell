@@ -42,8 +42,26 @@ pushd "$HUNSPELL_SOURCE_DIR"
             cp src/win_api/hunspelldll.h "$stage/include/hunspell"
         ;;
         "darwin")
+            opts='-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5'
+            export CFLAGS="$opts"
+            export CXXFLAGS="$opts"
+            export LDFLAGS="$opts"
+            ./configure --prefix="$stage"
+            make
+            make install
+            mkdir -p "$stage/lib/release"
+            mv "$stage/lib/"{*.a,*.dylib,*.alias} "$stage/lib/release"
         ;;
         "linux")
+            CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage"
+            make
+            make install
+            mkdir -p "$stage/include/hunspell"
+            mv "$stage/include/"*.h "$stage/include/hunspell/"
+
+            mv "$stage/lib" "$stage/release"
+            mkdir -p "$stage/lib"
+            mv "$stage/release" "$stage/lib"
         ;;
     esac
     mkdir -p "$stage/LICENSES"
