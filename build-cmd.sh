@@ -58,7 +58,7 @@ pushd "$HUNSPELL_SOURCE_DIR"
         ;;
     esac
     mkdir -p "$stage/include/hunspell"
-    cp src/hunspell{*.h,*.hxx} "$stage/include/hunspell"
+    cp src/hunspell/{*.h,*.hxx} "$stage/include/hunspell"
     cp src/win_api/hunspelldll.h "$stage/include/hunspell"
     mkdir -p "$stage/LICENSES"
     cp "license.hunspell" "$stage/LICENSES/hunspell.txt"
