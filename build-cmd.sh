@@ -36,10 +36,6 @@ pushd "$HUNSPELL_SOURCE_DIR"
             mkdir -p "$stage/lib/release"
             cp src/win_api/Debug_dll/libhunspell/libhunspell{.dll,.lib,.pdb} "$stage/lib/release"
             cp src/win_api/Release_dll/libhunspell/libhunspell{.dll,.lib,.pdb} "$stage/lib/release"
-
-            mkdir -p "$stage/include/hunspell"
-            cp src/hunspell{.h,.hxx} "$stage/include/hunspell"
-            cp src/win_api/hunspelldll.h "$stage/include/hunspell"
         ;;
         "darwin")
             opts='-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5'
@@ -61,6 +57,9 @@ pushd "$HUNSPELL_SOURCE_DIR"
             mv "$stage/release" "$stage/lib"
         ;;
     esac
+    mkdir -p "$stage/include/hunspell"
+    cp src/hunspell{*.h,*.hxx} "$stage/include/hunspell"
+    cp src/win_api/hunspelldll.h "$stage/include/hunspell"
     mkdir -p "$stage/LICENSES"
     cp "license.hunspell" "$stage/LICENSES/hunspell.txt"
     cp "license.myspell" "$stage/LICENSES/myspell.txt"
