@@ -6,6 +6,11 @@
 
 #include "w_char.hxx"
 
+#if LL_WINDOWS
+	// Member function 'near' conflicts with the Windows #define of 'near'
+	#undef near
+#endif // LL_WINDOWS
+
 class LIBHUNSPELL_DLL_EXPORTED RepList
 {
 protected:
