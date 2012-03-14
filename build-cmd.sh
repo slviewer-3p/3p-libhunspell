@@ -34,7 +34,7 @@ pushd "$HUNSPELL_SOURCE_DIR"
 
             mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
-            cp src/win_api/Debug_dll/libhunspell/libhunspell{.dll,.lib,.pdb} "$stage/lib/release"
+            cp src/win_api/Debug_dll/libhunspell/libhunspell{.dll,.lib,.pdb} "$stage/lib/debug"
             cp src/win_api/Release_dll/libhunspell/libhunspell{.dll,.lib,.pdb} "$stage/lib/release"
         ;;
         "darwin")
