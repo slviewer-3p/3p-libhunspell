@@ -47,6 +47,9 @@ pushd "$HUNSPELL_SOURCE_DIR"
             make install
             mkdir -p "$stage/lib/release"
             mv "$stage/lib/"{*.a,*.dylib,*.alias} "$stage/lib/release"
+            pushd "$stage/lib/release"
+              fix_dylib_id libhunspell-1.3.0.dylib
+            popd
         ;;
         "linux")
             CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage"
