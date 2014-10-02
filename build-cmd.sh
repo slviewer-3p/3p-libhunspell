@@ -24,6 +24,10 @@ eval "$("$AUTOBUILD" source_environment)"
 set -x
 
 stage="$(pwd)/stage"
+
+build=${AUTOBUILD_BUILD_ID:=0}
+echo "${HUNSPELL_VERSION}.${build}" > "${stage}/VERSION.txt"
+
 pushd "$HUNSPELL_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in
         "windows")
@@ -38,7 +42,7 @@ pushd "$HUNSPELL_SOURCE_DIR"
             cp src/win_api/Release_dll/libhunspell/libhunspell{.dll,.lib,.pdb} "$stage/lib/release"
         ;;
         "darwin")
-            opts='-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5'
+            opts='-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.7'
             export CFLAGS="$opts"
             export CXXFLAGS="$opts"
             export LDFLAGS="$opts"
