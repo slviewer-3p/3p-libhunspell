@@ -10,7 +10,7 @@ set -e
 HUNSPELL_VERSION="1.3.2"
 HUNSPELL_SOURCE_DIR="hunspell-1.3.2"
 
-if [ -z "$AUTOBUILD" ] ; then 
+if [ -z "$AUTOBUILD" ] ; then
     fail
 fi
 
@@ -42,7 +42,7 @@ pushd "$HUNSPELL_SOURCE_DIR"
             cp src/win_api/Release_dll/libhunspell/libhunspell{.dll,.lib,.pdb} "$stage/lib/release"
         ;;
         "darwin")
-            opts='-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.7'
+            opts='-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.9.sdk -mmacosx-version-min=10.7'
             export CFLAGS="$opts"
             export CXXFLAGS="$opts"
             export LDFLAGS="$opts"
