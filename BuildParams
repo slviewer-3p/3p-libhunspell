@@ -3,5 +3,3 @@ public_build = true
 
 # Incredibuild should not be used (so pdb information is good)
 USE_INCREDIBUILD=0
-
-oz_3p-hunspell.email = develop@catznip.com
