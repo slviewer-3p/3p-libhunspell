@@ -30,16 +30,19 @@ echo "${HUNSPELL_VERSION}.${build}" > "${stage}/VERSION.txt"
 
 pushd "$HUNSPELL_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in
-        "windows")
+        windows*)
             load_vsvars
 
-            build_sln "src/win_api/hunspell.sln" "Debug_dll|Win32"
-            build_sln "src/win_api/hunspell.sln" "Release_dll|Win32"
+            build_sln "src/win_api/hunspell.sln" "Release_dll|$AUTOBUILD_WIN_VSPLATFORM"
 
-            mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
-            cp src/win_api/Debug_dll/libhunspell/libhunspell{.dll,.lib,.pdb} "$stage/lib/debug"
-            cp src/win_api/Release_dll/libhunspell/libhunspell{.dll,.lib,.pdb} "$stage/lib/release"
+
+            if [ "$AUTOBUILD_ADDRSIZE" = 32 ]
+            then bitdir=src/win_api/Release_dll/libhunspell/libhunspell
+            else bitdir=src/win_api/x64/Release_dll/libhunspell
+            fi
+
+            cp "$bitdir"{.dll,.lib,.pdb} "$stage/lib/release"
         ;;
         "darwin")
             opts='-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.9.sdk -mmacosx-version-min=10.7'
