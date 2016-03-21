@@ -404,7 +404,7 @@ get_shared_library_fullname ()
 const char *
 relocate (const char *pathname)
 {
-#if defined PIC && defined INSTALLDIR
+#if defined PIC && defined INSTALLDIR && defined INSTALLPREFIX
   static int initialized;
 
   /* Initialization code for a shared library.  */
