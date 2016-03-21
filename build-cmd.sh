@@ -6,22 +6,32 @@ cd "$(dirname "$0")"
 set -x
 # make errors fatal
 set -e
+# complain about unset env variables
+set -u
 
-HUNSPELL_VERSION="1.3.2"
-HUNSPELL_SOURCE_DIR="hunspell-1.3.2"
+HUNSPELL_SOURCE_DIR="hunspell"
+# Look in configure script for line PACKAGE_VERSION='x.y.z', then capture
+# everything between single quotes.
+HUNSPELL_VERSION="$(expr "$(grep '^PACKAGE_VERSION=' "$HUNSPELL_SOURCE_DIR/configure")" \
+                         : ".*'\(.*\)'")"
 
 if [ -z "$AUTOBUILD" ] ; then
     fail
 fi
 
 if [ "$OSTYPE" = "cygwin" ] ; then
-    export AUTOBUILD="$(cygpath -u $AUTOBUILD)"
+    autobuild="$(cygpath -u $AUTOBUILD)"
+else
+    autobuild="$AUTOBUILD"
 fi
 
 # load autbuild provided shell functions and variables
 set +x
-eval "$("$AUTOBUILD" source_environment)"
+eval "$("$autobuild" source_environment)"
 set -x
+
+# set LL_BUILD and friends
+set_build_variables convenience Release
 
 stage="$(pwd)/stage"
 
@@ -44,8 +54,8 @@ pushd "$HUNSPELL_SOURCE_DIR"
 
             cp "$bitdir"{.dll,.lib,.pdb} "$stage/lib/release"
         ;;
-        "darwin")
-            opts='-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.9.sdk -mmacosx-version-min=10.7'
+        darwin*)
+            opts="-arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD"
             export CFLAGS="$opts"
             export CXXFLAGS="$opts"
             export LDFLAGS="$opts"
@@ -55,11 +65,12 @@ pushd "$HUNSPELL_SOURCE_DIR"
             mkdir -p "$stage/lib/release"
             mv "$stage/lib/"{*.a,*.dylib,*.alias} "$stage/lib/release"
             pushd "$stage/lib/release"
-              fix_dylib_id libhunspell-1.3.0.dylib
+              fix_dylib_id libhunspell-*.dylib
             popd
         ;;
-        "linux")
-            CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage"
+        linux*)
+            opts="-m$AUTOBUILD_ADDRSIZE $LL_BUILD"
+            CFLAGS="$opts" CXXFLAGS="$opts" ./configure --prefix="$stage"
             make
             make install
             mv "$stage/lib" "$stage/release"
