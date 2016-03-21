@@ -55,7 +55,7 @@ pushd "$HUNSPELL_SOURCE_DIR"
             cp "$bitdir"{.dll,.lib,.pdb} "$stage/lib/release"
         ;;
         darwin*)
-            opts="-arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD"
+            opts="-m$AUTOBUILD_ADDRSIZE -arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD"
             export CFLAGS="$opts"
             export CXXFLAGS="$opts"
             export LDFLAGS="$opts"
