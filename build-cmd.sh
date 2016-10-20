@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cd "$(dirname "$0")"
 
 # turn on verbose debugging output for parabuild logs.
-set -x
+exec 4>&1; export BASH_XTRACEFD=4; set -x
 # make errors fatal
 set -e
 # complain about unset env variables
@@ -16,7 +16,7 @@ HUNSPELL_VERSION="$(expr "$(grep '^PACKAGE_VERSION=' "$HUNSPELL_SOURCE_DIR/confi
                          : ".*'\(.*\)'")"
 
 if [ -z "$AUTOBUILD" ] ; then
-    fail
+    exit 1
 fi
 
 if [ "$OSTYPE" = "cygwin" ] ; then
@@ -25,15 +25,12 @@ else
     autobuild="$AUTOBUILD"
 fi
 
-# load autbuild provided shell functions and variables
-set +x
-eval "$("$autobuild" source_environment)"
-set -x
-
-# set LL_BUILD and friends
-set_build_variables convenience Release
-
 stage="$(pwd)/stage"
+
+# load autobuild provided shell functions and variables
+source_environment_tempfile="$stage/source_environment.sh"
+"$autobuild" source_environment > "$source_environment_tempfile"
+. "$source_environment_tempfile"
 
 build=${AUTOBUILD_BUILD_ID:=0}
 echo "${HUNSPELL_VERSION}.${build}" > "${stage}/VERSION.txt"
@@ -55,13 +52,13 @@ pushd "$HUNSPELL_SOURCE_DIR"
             cp "$bitdir"{.dll,.lib,.pdb} "$stage/lib/release"
         ;;
         darwin*)
-            opts="-m$AUTOBUILD_ADDRSIZE -arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD"
+            opts="-m$AUTOBUILD_ADDRSIZE -arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD_RELEASE"
             export CFLAGS="$opts"
             export CXXFLAGS="$opts"
             export LDFLAGS="$opts"
             # nat 2016-03-21: If configure / make is allowed to build dylibs,
             # it fails because although the makefile does pass -stdlib=libc++
-            # (from LL_BUILD) to the individual compile commands and to the
+            # (from LL_BUILD_RELEASE) to the individual compile commands and to the
             # local generated libtool script, libtool fails to pass it through
             # to the link command. That means that the linker is trying to
             # link a dylib against the (old, no longer supported) libstdc++
@@ -78,7 +75,7 @@ pushd "$HUNSPELL_SOURCE_DIR"
             mv "$stage/lib/"*.a "$stage/lib/release"
         ;;
         linux*)
-            opts="-m$AUTOBUILD_ADDRSIZE $LL_BUILD"
+            opts="-m$AUTOBUILD_ADDRSIZE $LL_BUILD_RELEASE"
             CFLAGS="$opts" CXXFLAGS="$opts" ./configure --prefix="$stage"
             make
             make install
@@ -94,5 +91,3 @@ pushd "$HUNSPELL_SOURCE_DIR"
     cp "license.hunspell" "$stage/LICENSES/hunspell.txt"
     cp "license.myspell" "$stage/LICENSES/myspell.txt"
 popd
-
-pass
