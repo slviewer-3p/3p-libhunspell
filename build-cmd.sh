@@ -56,23 +56,14 @@ pushd "$HUNSPELL_SOURCE_DIR"
             export CFLAGS="$opts"
             export CXXFLAGS="$opts"
             export LDFLAGS="$opts"
-            # nat 2016-03-21: If configure / make is allowed to build dylibs,
-            # it fails because although the makefile does pass -stdlib=libc++
-            # (from LL_BUILD_RELEASE) to the individual compile commands and to the
-            # local generated libtool script, libtool fails to pass it through
-            # to the link command. That means that the linker is trying to
-            # link a dylib against the (old, no longer supported) libstdc++
-            # rather than libc++ with which the object files were compiled,
-            # leading to strange standard-library-related link errors.
-            # Fortunately, the viewer doesn't actually consume dylibs, so
-            # suppress them to bypass this weird problem. If it did, we'd be
-            # in the unfortunate position of trying to diagnose just why
-            # autoconf's libtool swallows the -stdlib switch in link mode.
-            ./configure --prefix="$stage" --disable-shared
+            ./configure --prefix="$stage"
             make
             make install
             mkdir -p "$stage/lib/release"
-            mv "$stage/lib/"*.a "$stage/lib/release"
+            mv "$stage/lib/"{*.a,*.dylib,*.alias} "$stage/lib/release"
+            pushd "$stage/lib/release"
+              fix_dylib_id libhunspell-*.dylib
+            popd
         ;;
         linux*)
             opts="-m$AUTOBUILD_ADDRSIZE $LL_BUILD_RELEASE"
