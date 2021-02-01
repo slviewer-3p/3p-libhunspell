@@ -62,7 +62,20 @@ pushd "$HUNSPELL_SOURCE_DIR"
             mkdir -p "$stage/lib/release"
             mv "$stage/lib/"{*.a,*.dylib,*.alias} "$stage/lib/release"
             pushd "$stage/lib/release"
-              fix_dylib_id libhunspell-*.dylib
+                fix_dylib_id libhunspell-*.dylib
+              
+                CONFIG_FILE="$build_secrets_checkout/code-signing-osx/config.sh"
+                if [ -f "$CONFIG_FILE" ]; then
+                    source $CONFIG_FILE
+                    for dylib in libhunspell-*.dylib;
+                    do
+                        if [ -f "$dylib" ]; then
+                            codesign --force --timestamp --sign "$APPLE_SIGNATURE" "$dylib"
+                        fi
+                    done
+                else
+                    echo "No config file found; skipping codesign."
+                fi
             popd
         ;;
         linux*)
